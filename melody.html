@@ -2,1268 +2,2331 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <title>発車メロディ一覧・実録</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="icon" href="icon.ico">
+
+        <title>発車メロディ一覧・実録｜阪和線委員会公式</title>
+
         <style>
-            body {
-                font-family: 'sans-serif', 'Noto Sans';
+        /* =========================
+           基本設定
+        ========================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            color: #263445;
+            background: #f3f6fa;
+            font-family:
+                "Yu Gothic",
+                "Hiragino Kaku Gothic ProN",
+                Meiryo,
+                sans-serif;
+            line-height: 1.8;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        /* =========================
+           ヘッダー
+        ========================= */
+
+        .site-header {
+            color: #fff;
+            background: linear-gradient(
+                135deg,
+                #10243e,
+                #183e63
+            );
+            border-bottom: 4px solid #b8c9da;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 34px 28px 30px;
+        }
+
+        .site-label {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            color: #e2ebf5;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+        }
+
+        .site-title {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 38px);
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .site-title span {
+            color: #b8d9f4;
+        }
+
+        .site-subtitle {
+            margin: 10px 0 0;
+            color: #d2dfec;
+            font-size: 15px;
+        }
+
+        /* =========================
+           三本線ボタン
+        ========================= */
+
+        .menu-toggle {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1100;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+
+            width: 48px;
+            height: 48px;
+            padding: 10px;
+
+            border: 1px solid #dce4ed;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 3px 12px rgba(16, 36, 62, 0.15);
+
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            border-radius: 3px;
+            background: #183e63;
+
+            transition:
+                transform 0.25s,
+                opacity 0.2s;
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* =========================
+           背景オーバーレイ
+        ========================= */
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+
+            background: rgba(9, 24, 42, 0.48);
+
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition:
+                opacity 0.3s,
+                visibility 0.3s;
+        }
+
+        .menu-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* =========================
+           サイドメニュー
+        ========================= */
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+
+            width: min(320px, 85vw);
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+
+            padding: 84px 18px 28px;
+
+            background: #fff;
+            border-right: 1px solid #dce4ed;
+            box-shadow: 8px 0 28px rgba(16, 36, 62, 0.12);
+
+            transform: translateX(-105%);
+            visibility: hidden;
+
+            transition:
+                transform 0.3s ease,
+                visibility 0.3s;
+        }
+
+        .side-menu.is-open {
+            transform: translateX(0);
+            visibility: visible;
+        }
+
+        .side-menu-heading {
+            margin: 0 0 8px;
+            padding: 0 12px 14px;
+            border-bottom: 2px solid #183e63;
+            color: #183653;
+            font-size: 20px;
+        }
+
+        .side-menu-label {
+            margin: 0 0 18px;
+            padding: 0 12px;
+            color: #8997a7;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+        }
+
+        .side-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .side-menu-link,
+        .submenu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+
+            width: 100%;
+            min-height: 48px;
+            padding: 12px;
+
+            border: 0;
+            border-radius: 7px;
+
+            color: #344c66;
+            background: transparent;
+
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .side-menu-link:hover,
+        .submenu-toggle:hover {
+            color: #1674ad;
+            background: #edf4fa;
+        }
+
+        .side-menu-link::before,
+        .submenu-toggle::before {
+            content: "";
+            flex: 0 0 5px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #467fa8;
+        }
+
+        .side-menu-link > span,
+        .submenu-toggle > span:first-of-type {
+            flex: 1;
+        }
+
+        .submenu-arrow {
+            color: #6e8ca9;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .submenu-toggle[aria-expanded="true"] .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* =========================
+           サブメニュー
+        ========================= */
+
+        .submenu {
+            display: grid;
+            grid-template-rows: 0fr;
+            margin: 0;
+            padding: 0;
+            visibility: hidden;
+
+            transition:
+                grid-template-rows 0.25s,
+                margin 0.25s,
+                visibility 0.25s;
+        }
+
+        .submenu-inner {
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .submenu.is-expanded {
+            grid-template-rows: 1fr;
+            margin: 2px 0 8px;
+            padding-left: 18px;
+            visibility: visible;
+        }
+
+        .submenu-link {
+            display: block;
+            margin-top: 3px;
+            padding: 10px 12px 10px 16px;
+
+            border-left: 2px solid #c7d8e8;
+            border-radius: 0 6px 6px 0;
+
+            color: #526a83;
+            font-size: 13px;
+        }
+
+        .submenu-link:hover {
+            color: #1674ad;
+            background: #edf4fa;
+            border-left-color: #467fa8;
+        }
+
+        .submenu-link::before {
+            content: "›";
+            margin-right: 10px;
+            color: #6e8ca9;
+        }
+
+        /* =========================
+           メインコンテンツ
+        ========================= */
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 64px;
+        }
+
+        .section-heading {
+            margin: 0 0 8px;
+            color: #183653;
+            font-size: 25px;
+        }
+
+        .heading-line {
+            width: 48px;
+            height: 4px;
+            margin-bottom: 14px;
+            border-radius: 2px;
+            background: #467fa8;
+        }
+
+        .section-description {
+            margin: 0 0 24px;
+            color: #738196;
+            font-size: 14px;
+        }
+
+        .intro-card {
+            margin-bottom: 32px;
+            padding: 24px 28px;
+
+            border: 1px solid #e0e7ef;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 5px 20px rgba(30, 53, 76, 0.05);
+        }
+
+        .intro-card p {
+            margin: 0;
+            color: #586a7e;
+            font-size: 14px;
+        }
+
+        /* =========================
+           表
+           table内の文字・色は元のまま
+        ========================= */
+
+        .table-card {
+            padding: 22px;
+            border: 1px solid #e0e7ef;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 5px 20px rgba(30, 53, 76, 0.05);
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .melody-table {
+            width: 100%;
+            min-width: 850px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .melody-table th,
+        .melody-table td {
+            padding: 12px 14px;
+            border: 1px solid #cbd4df;
+            white-space: nowrap;
+        }
+
+        .melody-table th {
+            font-weight: 700;
+        }
+
+        .melody-table thead th {
+            background-color: lightgrey;
+        }
+
+        /*
+         * 管理番号セルの背景色・文字色は
+         * 元の各行のインライン指定を維持する。
+         */
+
+        .melody-table tbody th a {
+            text-decoration: none;
+        }
+
+        .melody-table tbody th a:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================
+           フッター
+        ========================= */
+
+        .site-footer {
+            padding: 24px 20px;
+            border-top: 1px solid #dce4ed;
+            color: #738196;
+            background: #fff;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .site-footer p {
+            margin: 0;
+        }
+
+        /* =========================
+           スマートフォン対応
+        ========================= */
+
+        @media (max-width: 700px) {
+            .header-inner {
+                padding: 84px 20px 26px;
             }
-        </style>
+
+            .site-title {
+                font-size: 25px;
+            }
+
+            .site-subtitle {
+                font-size: 13px;
+            }
+
+            main {
+                padding: 28px 14px 44px;
+            }
+
+            .section-heading {
+                font-size: 22px;
+            }
+
+            .intro-card {
+                padding: 20px 16px;
+            }
+
+            .table-card {
+                padding: 12px;
+            }
+
+            .melody-table th,
+            .melody-table td {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
     </head>
-    <body style="text-align: center;">
-        <h1>発車メロディ一覧</h1>
-        <p>
-            管理番号をクリックすることでページに飛べます<br>
-            基本JR東日本管内でのみの反映を載せているのでその他路線（しなの鉄道線）などは載せておりません。
-        </p>
-        <table border="1" align="center">
-            <tr style="background-color: lightgrey;">
-                <th>管理番</a>号</th>
-                <th>曲名</th>
-                <th>初回使用駅</th>
-                <th style="width: 200px;">最終使用駅</th>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: darkblue;"><a href="melody/shuhen1/shuhen1.html" style="color: white;">周辺地域1番</a></th>
-                <td style="width: 300px;">清流</td>
-                <td style="width: 160px;">北千住</td>
-                <td style="width: 160px;">勝浦</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: deepskyblue;"><a href="melody/shuhen2/shuhen2.html" style="color: black;">周辺地域2番</a></th>
-                <td style="width: 300px;">雲を友として</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;">安房鴨川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: blue;"><a href="melody/shuhen3/shuhen3.html" style="color: white;">周辺地域3番</a></th>
-                <td style="width: 300px;">春</td>
-                <td style="width: 160px;">(中央本線？)</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: orangered;"><a href="melody/shuhen4/shuhen4.html" style="color: black;">周辺地域4番</a></th>
-                <td style="width: 300px;">せせらぎ</td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: orange;"><a href="melody/higashinihon5/higashinihon5.html" style="color: black;">東日本地域5番</a></th>
-                <td style="width: 300px;">Cielo Estrellado</td>
-                <td style="width: 160px;">（東海道線？）</td>
-                <td style="width: 160px;">大船</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: white;"><a href="melody/higashinihon6/higashinihon6.html" style="color: black;">東日本地域6番</a></th>
-                <td style="width: 300px;">Gota del Vient</td>
-                <td style="width: 160px;">（？）</td>
-                <td style="width: 160px;">大船</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: mediumseagreen;"><a>東日本地域7番</a></th>
-                <td style="width: 300px;">Water Crown</td>
-                <td style="width: 160px;">（くりこま高原？）</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>東日本地域8番</a></th>
-                <td style="width: 300px;">Verde Rayo</td>
-                <td style="width: 160px;">（拝島？）</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(山形)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域9番</a></th>
-                <td style="width: 300px;">高原</td>
-                <td style="width: 160px;">（？）</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域10番</a></th>
-                <td style="width: 300px;">草原</td>
-                <td style="width: 160px;">（代々木？）</td>
-                <td style="width: 160px;">大原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域11番</a></th>
-                <td style="width: 300px;">四季～愛しき子供達へ</td>
-                <td style="width: 160px;">（武蔵小金井？）</td>
-                <td style="width: 160px;">茂原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域12番</a></th>
-                <td style="width: 300px;">こころ</td>
-                <td style="width: 160px;">（？）</td>
-                <td style="width: 160px;">茂原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: gray;"><a>近郊地域13番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">川越線</td>
-                <td style="width: 160px;">西川越</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: gray;"><a>近郊地域14番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">川越線</td>
-                <td style="width: 160px;">西川越</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域15番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">（？）</td>
-                <td style="width: 160px;">甲府</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域16番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">（？）</td>
-                <td style="width: 160px;">甲府</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域17番</a></th>
-                <td style="width: 300px;">クラルテ</td>
-                <td style="width: 160px;">（稲毛？）</td>
-                <td style="width: 160px;">安中榛名</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域18番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">（津田沼？）</td>
-                <td style="width: 160px;">拝島</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域19番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">武蔵中原</td>
-                <td style="width: 160px;">南武線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: darkcyan;"><a>近郊地域20番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">相模線</td>
-                <td style="width: 160px;">相模線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域21番</a></th>
-                <td style="width: 300px;">JR-SH5-1</td>
-                <td style="width: 160px;">（武蔵新城？）</td>
-                <td style="width: 160px;">佐原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域22番</a></th>
-                <td style="width: 300px;">JR-SH5-3</td>
-                <td style="width: 160px;">吹上</td>
-                <td style="width: 160px;">勝浦</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域23番</a></th>
-                <td style="width: 300px;">JR-SH2-1</td>
-                <td style="width: 160px;">（南武線？）</td>
-                <td style="width: 160px;">佐原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: orangered;"><a href="melody/kinko24/kinko24.html" style="color: black;">近郊地域24番</a></th>
-                <td style="width: 300px;">JR-SH2-3</td>
-                <td style="width: 160px;">八王子</td>
-                <td style="width: 160px;">片倉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color: orangered;"><a href="melody/kinko25/kinko25.html" style="color: black;">近郊地域25番</a></th>
-                <td style="width: 300px;">JR-SH1-1</td>
-                <td style="width: 160px;">（八王子？）</td>
-                <td style="width: 160px;">松本</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域26番</a></th>
-                <td style="width: 300px;">JR-SH1-3</td>
-                <td style="width: 160px;">辻堂</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(軽井沢)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域27番</a></th>
-                <td style="width: 300px;">JR-SH8-1</td>
-                <td style="width: 160px;">桶川</td>
-                <td style="width: 160px;">桶川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellowgreen;"><a>近郊地域28番</a></th>
-                <td style="width: 300px;">JR-SH8-3</td>
-                <td style="width: 160px;">八王子</td>
-                <td style="width: 160px;">勝浦</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域29番</a></th>
-                <td style="width: 300px;">JR-SH3-1</td>
-                <td style="width: 160px;">北本</td>
-                <td style="width: 160px;">北本</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域30番</a></th>
-                <td style="width: 300px;">JR-SH3-3</td>
-                <td style="width: 160px;">中央線</td>
-                <td style="width: 160px;">佐原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域31番</a></th>
-                <td style="width: 300px;">JR-SH9-1</td>
-                <td style="width: 160px;"><span style="color: red;">採用なし</span></td>
-                <td style="width: 160px;"></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域32番</a></th>
-                <td style="width: 300px;">JR-SH9-3</td>
-                <td style="width: 160px;">御茶ノ水</td>
-                <td style="width: 160px;">御茶ノ水</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域33番</a></th>
-                <td style="width: 300px;">JR-SH4-1</td>
-                <td style="width: 160px;">（宮原？）</td>
-                <td style="width: 160px;">沼田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域34番</a></th>
-                <td style="width: 300px;">JR-SH4-3</td>
-                <td style="width: 160px;"><span style="color: red;">採用なし</span></td>
-                <td style="width: 160px;"></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: gray;"><a>近郊地域35番</a></th>
-                <td style="width: 300px;">JR-SH7-1</td>
-                <td style="width: 160px;">八王子</td>
-                <td style="width: 160px;">本庄</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: white;"><a>近郊地域36番</a></th>
-                <td style="width: 300px;">JR-SH7-3</td>
-                <td style="width: 160px;"><span style="color: red;">採用なし</span></td>
-                <td style="width: 160px;"></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: gray;"><a>近郊地域37番</a></th>
-                <td style="width: 300px;">JR-SH6-1</td>
-                <td style="width: 160px;">八王子</td>
-                <td style="width: 160px;">茅ヶ崎</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域38番</a></th>
-                <td style="width: 300px;">JR-SH6-3</td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;">大原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域39番</a></th>
-                <td style="width: 300px;">ホリデイ</td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;">中央線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域40番</a></th>
-                <td style="width: 300px;">春待ち風</td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;">相原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域41番</a></th>
-                <td style="width: 300px;">秋桜</td>
-                <td style="width: 160px;">戸塚</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域42番</a></th>
-                <td style="width: 300px;">あざみ野</td>
-                <td style="width: 160px;">尾久</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(尾久)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域43番</a></th>
-                <td style="width: 300px;">線路の彼方</td>
-                <td style="width: 160px;">尾久</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域44番</a></th>
-                <td style="width: 300px;">古いオルゴール</td>
-                <td style="width: 160px;">代々木</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域45番</a></th>
-                <td style="width: 300px;">光と風と</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域46番</a></th>
-                <td style="width: 300px;">くるみあそび</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;">小金井</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域47番</a></th>
-                <td style="width: 300px;">twilight</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: darkblue;"><a>近郊地域48番</a></th>
-                <td style="width: 300px;">花と空</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(我孫子)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: darkblue;"><a>近郊地域49番</a></th>
-                <td style="width: 300px;">sunrise</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(常磐線)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域50番</a></th>
-                <td style="width: 300px;">cappuccino</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(我孫子)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域51番</a></th>
-                <td style="width: 300px;">メロディー</td>
-                <td style="width: 160px;">武蔵野線</td>
-                <td style="width: 160px;">東大宮</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域52番</a></th>
-                <td style="width: 300px;">スプリングボックス</td>
-                <td style="width: 160px;">武蔵野線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域53番</a></th>
-                <td style="width: 300px;">シンコペーション</td>
-                <td style="width: 160px;">東大宮</td>
-                <td style="width: 160px;">東大宮</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域54番</a></th>
-                <td style="width: 300px;">朝の静けさ</td>
-                <td style="width: 160px;">さいたま新都心</td>
-                <td style="width: 160px;">青梅線・五日市線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域55番</a></th>
-                <td style="width: 300px;">美しき丘</td>
-                <td style="width: 160px;">さいたま新都心</td>
-                <td style="width: 160px;">袖ヶ浦</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域56番</a></th>
-                <td style="width: 300px;">mellow time</td>
-                <td style="width: 160px;">岡本</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域57番</a></th>
-                <td style="width: 300px;">sunny islands</td>
-                <td style="width: 160px;">氏家</td>
-                <td style="width: 160px;">市川大野など</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域58番</a></th>
-                <td style="width: 300px;">dance on</td>
-                <td style="width: 160px;">宝積寺</td>
-                <td style="width: 160px;">日進</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域59番</a></th>
-                <td style="width: 300px;">ベルの響き</td>
-                <td style="width: 160px;">岡部</td>
-                <td style="width: 160px;">外房線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域60番</a></th>
-                <td style="width: 300px;">雪解け間近</td>
-                <td style="width: 160px;">八街</td>
-                <td style="width: 160px;">佐原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellowgreen;"><a>近郊地域61番</a></th>
-                <td style="width: 300px;">花のほころび</td>
-                <td style="width: 160px;">渋谷</td>
-                <td style="width: 160px;">立川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域62番</a></th>
-                <td style="width: 300px;">輝く街並み</td>
-                <td style="width: 160px;">梁川</td>
-                <td style="width: 160px;">梁川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: gray;"><a>近郊地域63番</a></th>
-                <td style="width: 300px;">夏が来れば</td>
-                <td style="width: 160px;">武蔵高萩</td>
-                <td style="width: 160px;">武蔵高萩</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: forestgreen;"><a>近郊地域64番</a></th>
-                <td style="width: 300px;">コーラルリーフ</td>
-                <td style="width: 160px;">武蔵浦和</td>
-                <td style="width: 160px;">銚子</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域65番</a></th>
-                <td style="width: 300px;">星空の下</td>
-                <td style="width: 160px;">府中本町</td>
-                <td style="width: 160px;">新前橋</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: brown;"><a>近郊地域66番</a></th>
-                <td style="width: 300px;">南風の行方</td>
-                <td style="width: 160px;">誉田</td>
-                <td style="width: 160px;">上総一ノ宮</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域67番</a></th>
-                <td style="width: 300px;">春一番</td>
-                <td style="width: 160px;">東松戸</td>
-                <td style="width: 160px;">東松戸</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域68番</a></th>
-                <td style="width: 300px;">公園の楓</td>
-                <td style="width: 160px;">千葉みなと</td>
-                <td style="width: 160px;">京葉線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域69番</a></th>
-                <td style="width: 300px;">公園通り</td>
-                <td style="width: 160px;">千葉みなと</td>
-                <td style="width: 160px;">千葉みなと</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域70番</a></th>
-                <td style="width: 300px;">九月の風</td>
-                <td style="width: 160px;">千葉みなと</td>
-                <td style="width: 160px;">千葉みなと</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域71番</a></th>
-                <td style="width: 300px;">ドリームタイム</td>
-                <td style="width: 160px;">稲毛海岸</td>
-                <td style="width: 160px;">稲毛海岸</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域72番</a></th>
-                <td style="width: 300px;">緑の車窓</td>
-                <td style="width: 160px;">検見川浜</td>
-                <td style="width: 160px;">検見川浜</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: red;"><a>近郊地域73番</a></th>
-                <td style="width: 300px;">海辺の散歩</td>
-                <td style="width: 160px;">南船橋</td>
-                <td style="width: 160px;">佐野</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域74番</a></th>
-                <td style="width: 300px;">蝶々のように</td>
-                <td style="width: 160px;">佐倉</td>
-                <td style="width: 160px;">佐倉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域75番</a></th>
-                <td style="width: 300px;">summer night</td>
-                <td style="width: 160px;">佐倉</td>
-                <td style="width: 160px;">佐倉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域76番</a></th>
-                <td style="width: 300px;">ムーンストーン</td>
-                <td style="width: 160px;">佐倉</td>
-                <td style="width: 160px;">佐倉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域77番</a></th>
-                <td style="width: 300px;">シーウインド</td>
-                <td style="width: 160px;">佐倉</td>
-                <td style="width: 160px;">佐倉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: darkturquoise;"><a>近郊地域78番</a></th>
-                <td style="width: 300px;">ジュピターB</td>
-                <td style="width: 160px;">井野</td>
-                <td style="width: 160px;">上越線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域79番</a></th>
-                <td style="width: 300px;">空へ</td>
-                <td style="width: 160px;">竜王</td>
-                <td style="width: 160px;">竜王</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域80番</a></th>
-                <td style="width: 300px;">柔らかな草原</td>
-                <td style="width: 160px;">竜王</td>
-                <td style="width: 160px;">竜王</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>近郊地域81番</a></th>
-                <td style="width: 300px;">ドリーム・パーク</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;">東京</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域82番</a></th>
-                <td style="width: 300px;">春だより</td>
-                <td style="width: 160px;">両国</td>
-                <td style="width: 160px;">両国</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域83番</a></th>
-                <td style="width: 300px;">夢のワルツ</td>
-                <td style="width: 160px;">両国</td>
-                <td style="width: 160px;">両国</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域84番</a></th>
-                <td style="width: 300px;">森の妖精</td>
-                <td style="width: 160px;">市川</td>
-                <td style="width: 160px;">市川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: yellow;"><a>近郊地域85番</a></th>
-                <td style="width: 300px;">朝つゆ</td>
-                <td style="width: 160px;">市川</td>
-                <td style="width: 160px;">市川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域86番</a></th>
-                <td style="width: 300px;">楽々鉄道旅行</td>
-                <td style="width: 160px;">市川</td>
-                <td style="width: 160px;">青梅</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orangered;"><a>近郊地域87番</a></th>
-                <td style="width: 300px;">旅の予感</td>
-                <td style="width: 160px;">青梅線</td>
-                <td style="width: 160px;">青梅線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域88番</a></th>
-                <td style="width: 300px;">キッズステーション</td>
-                <td style="width: 160px;">巌根</td>
-                <td style="width: 160px;">羽沢横浜国大</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: brown;"><a>近郊地域89番</a></th>
-                <td style="width: 300px;">朝の教会</td>
-                <td style="width: 160px;">安房鴨川</td>
-                <td style="width: 160px;">安房鴨川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: brown;"><a>近郊地域90番</a></th>
-                <td style="width: 300px;">幸せチャイム</td>
-                <td style="width: 160px;">安房鴨川</td>
-                <td style="width: 160px;">安房鴨川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域91番</a></th>
-                <td style="width: 300px;">通称(思い出の街)</td>
-                <td style="width: 160px;">成田</td>
-                <td style="width: 160px;">成田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域92番</a></th>
-                <td style="width: 300px;">窓の花飾り</td>
-                <td style="width: 160px;">成田</td>
-                <td style="width: 160px;">成田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域93番</a></th>
-                <td style="width: 300px;">スイートコール</td>
-                <td style="width: 160px;">成田</td>
-                <td style="width: 160px;">成田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域94番</a></th>
-                <td style="width: 300px;">フラワーショップ</td>
-                <td style="width: 160px;">成田</td>
-                <td style="width: 160px;">青梅</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域95番</a></th>
-                <td style="width: 300px;">旅立ちB</td>
-                <td style="width: 160px;">成田</td>
-                <td style="width: 160px;">成田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域96番</a></th>
-                <td style="width: 300px;">田園浪漫</td>
-                <td style="width: 160px;">竜王</td>
-                <td style="width: 160px;">竜王</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: blue;"><a>近郊地域97番</a></th>
-                <td style="width: 300px;">高原のつぶやき</td>
-                <td style="width: 160px;">竜王</td>
-                <td style="width: 160px;">竜王</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域98番</a></th>
-                <td style="width: 300px;">希望の朝</td>
-                <td style="width: 160px;">成田空港</td>
-                <td style="width: 160px;">成田空港</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域99番</a></th>
-                <td style="width: 300px;">淡い恋心</td>
-                <td style="width: 160px;">武蔵小杉</td>
-                <td style="width: 160px;">武蔵小杉</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:blue;"><a>近郊地域100番</a></th>
-                <td style="width: 300px;">青空と線路</td>
-                <td style="width: 160px;">甲府</td>
-                <td style="width: 160px;">甲府</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:gold;"><a>近郊地域101番</a></th>
-                <td style="width: 300px;">ジュピターG</td>
-                <td style="width: 160px;">伊勢崎</td>
-                <td style="width: 160px;">伊勢崎</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:gold;"><a>近郊地域102番</a></th>
-                <td style="width: 300px;">通勤ステップ</td>
-                <td style="width: 160px;">伊勢崎</td>
-                <td style="width: 160px;">伊勢崎</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>近郊地域103番</a></th>
-                <td style="width: 300px;">ハッピーガール</td>
-                <td style="width: 160px;">幕張</td>
-                <td style="width: 160px;">幕張</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>近郊地域104番</a></th>
-                <td style="width: 300px;">朝のドヴィッシー</td>
-                <td style="width: 160px;">幕張</td>
-                <td style="width: 160px;">幕張</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>近郊地域105番</a></th>
-                <td style="width: 300px;">ジュピターE</td>
-                <td style="width: 160px;">幕張</td>
-                <td style="width: 160px;">幕張</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>近郊地域106番</a></th>
-                <td style="width: 300px;">幸福の銀レール</td>
-                <td style="width: 160px;">幕張</td>
-                <td style="width: 160px;">幕張</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>近郊地域107番</a></th>
-                <td style="width: 300px;">パシフィック</td>
-                <td style="width: 160px;">南流山</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(南流山)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orange;"><a>近郊地域108番</a></th>
-                <td style="width: 300px;">ナイスガイ！</td>
-                <td style="width: 160px;">品川</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(品川)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orange;"><a>近郊地域109番</a></th>
-                <td style="width: 300px;">蝶</td>
-                <td style="width: 160px;">品川</td>
-                <td style="width: 160px;">品川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>近郊地域110番</a></th>
-                <td style="width: 300px;">木もれ陽の散歩道</td>
-                <td style="width: 160px;">東神奈川</td>
-                <td style="width: 160px;">武蔵小金井</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域111番</a></th>
-                <td style="width: 300px;">子</td>
-                <td style="width: 160px;">取手</td>
-                <td style="width: 160px;">取手</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:deepskyblue;"><a>近郊地域112番</a></th>
-                <td style="width: 300px;">おはよう</td>
-                <td style="width: 160px;">品川</td>
-                <td style="width: 160px;">品川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>近郊地域113番</a></th>
-                <td style="width: 300px;">トレイントレイン</td>
-                <td style="width: 160px;">品川</td>
-                <td style="width: 160px;">品川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域114番</a></th>
-                <td style="width: 300px;">JR-SHR1-1</td>
-                <td style="width: 160px;">東我孫子</td>
-                <td style="width: 160px;">東我孫子</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域115番</a></th>
-                <td style="width: 300px;">JR-SHR1-3</td>
-                <td style="width: 160px;">安食</td>
-                <td style="width: 160px;">安食</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域116番</a></th>
-                <td style="width: 300px;">JR-SHR2-1</td>
-                <td style="width: 160px;">小林</td>
-                <td style="width: 160px;">小林</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域117番</a></th>
-                <td style="width: 300px;">JR-SHR2-3</td>
-                <td style="width: 160px;">東我孫子</td>
-                <td style="width: 160px;">東我孫子</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域118番</a></th>
-                <td style="width: 300px;">JR-SHR3-1</td>
-                <td style="width: 160px;">木下</td>
-                <td style="width: 160px;">木下</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域119番</a></th>
-                <td style="width: 300px;">JR-SHR3-3</td>
-                <td style="width: 160px;">湖北</td>
-                <td style="width: 160px;">湖北</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:mediumblue;"><a>近郊地域120番</a></th>
-                <td style="width: 300px;">JR-SHR4-1</td>
-                <td style="width: 160px;">稲毛</td>
-                <td style="width: 160px;">稲毛</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域121番</a></th>
-                <td style="width: 300px;">JR-SHR4-3</td>
-                <td style="width: 160px;">布佐</td>
-                <td style="width: 160px;">布佐</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:brown;"><a>近郊地域122番</a></th>
-                <td style="width: 300px;">JR-SHR5-1</td>
-                <td style="width: 160px;">誉田</td>
-                <td style="width: 160px;">誉田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域123番</a></th>
-                <td style="width: 300px;">JR-SHR5-3</td>
-                <td style="width: 160px;">木下</td>
-                <td style="width: 160px;">木下</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域124番</a></th>
-                <td style="width: 300px;">JR-SHR6-1</td>
-                <td style="width: 160px;">新木</td>
-                <td style="width: 160px;">新木</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域125番</a></th>
-                <td style="width: 300px;">JR-SHR6-3</td>
-                <td style="width: 160px;">小林</td>
-                <td style="width: 160px;">小林</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域126番</a></th>
-                <td style="width: 300px;">JR-SHR7-1</td>
-                <td style="width: 160px;">湖北</td>
-                <td style="width: 160px;">湖北</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:brown;"><a>近郊地域127番</a></th>
-                <td style="width: 300px;">JR-SHR7-3</td>
-                <td style="width: 160px;">誉田</td>
-                <td style="width: 160px;">誉田</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域128番</a></th>
-                <td style="width: 300px;">JR-SHR8-1</td>
-                <td style="width: 160px;">布佐</td>
-                <td style="width: 160px;">布佐</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:mediumblue;"><a>近郊地域129番</a></th>
-                <td style="width: 300px;">JR-SHR8-3</td>
-                <td style="width: 160px;">稲毛</td>
-                <td style="width: 160px;">稲毛</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域130番</a></th>
-                <td style="width: 300px;">JR-SHR9-1</td>
-                <td style="width: 160px;">安食</td>
-                <td style="width: 160px;">安食</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域131番</a></th>
-                <td style="width: 300px;">JR-SHR9-3</td>
-                <td style="width: 160px;">新木</td>
-                <td style="width: 160px;">新木</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:forestgreen;"><a>新宿102番</a></th>
-                <td style="width: 300px;">farewell</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">五日市線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:forestgreen;"><a>新宿103番</a></th>
-                <td style="width: 300px;">遠い青空</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">相原</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:forestgreen;"><a>新宿104番</a></th>
-                <td style="width: 300px;">夏色の時間</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">新習志野</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: orange;"><a>新宿105番</a></th>
-                <td style="width: 300px;">美しき丘</td>
-                <td style="width: 160px;">さいたま新都心</td>
-                <td style="width: 160px;">袖ヶ浦</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:firebrick;"><a>新宿106番</a></th>
-                <td style="width: 300px;">see you again</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">東北新幹線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>新宿107番</a></th>
-                <td style="width: 300px;">海岸通り</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">上総一ノ宮</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>新宿108番</a></th>
-                <td style="width: 300px;">すすきの高原</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>新宿109番</a></th>
-                <td style="width: 300px;">小川のせせらぎ</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>新宿110番</a></th>
-                <td style="width: 300px;">木々の目覚め</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">拝島</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>新宿111番</a></th>
-                <td style="width: 300px;">風と共に</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">東北新幹線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>新宿112番</a></th>
-                <td style="width: 300px;">新たな季節</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">埼京線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color: seagreen;"><a>新宿113番</a></th>
-                <td style="width: 300px;">twilight</td>
-                <td style="width: 160px;">我孫子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(長野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>新宿114番</a></th>
-                <td style="width: 300px;">airly</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;">外房線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域101番</a></th>
-                <td style="width: 300px;">SF22-29</td>
-                <td style="width: 160px;">金町</td>
-                <td style="width: 160px;">常磐線</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域102番</a></th>
-                <td style="width: 300px;">SF-2</td>
-                <td style="width: 160px;">金町</td>
-                <td style="width: 160px;">金町</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域103番</a></th>
-                <td style="width: 300px;">遊園地のある駅</td>
-                <td style="width: 160px;">大崎</td>
-                <td style="width: 160px;">品川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域104番</a></th>
-                <td style="width: 300px;">海の駅</td>
-                <td style="width: 160px;">大崎</td>
-                <td style="width: 160px;">大崎</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域105番</a></th>
-                <td style="width: 300px;">教会の見える駅</td>
-                <td style="width: 160px;">大崎</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域106番</a></th>
-                <td style="width: 300px;">SF10-38</td>
-                <td style="width: 160px;">大崎</td>
-                <td style="width: 160px;">大崎</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:deepskyblue;"><a>周辺地域107番</a></th>
-                <td style="width: 300px;">チャイム</td>
-                <td style="width: 160px;">品川</td>
-                <td style="width: 160px;">品川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域108番</a></th>
-                <td style="width: 300px;">SF10-31</td>
-                <td style="width: 160px;">柏</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(辰野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:darkblue;"><a>周辺地域109番</a></th>
-                <td style="width: 300px;">SF10-43</td>
-                <td style="width: 160px;">柏</td>
-                <td style="width: 160px;">柏</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:darkblue;"><a>周辺地域110番</a></th>
-                <td style="width: 300px;">SF10-68</td>
-                <td style="width: 160px;">松戸</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(品川)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域111番</a></th>
-                <td style="width: 300px;">SF22-14</td>
-                <td style="width: 160px;">松戸</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(南流山)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>周辺地域112番</a></th>
-                <td style="width: 300px;">春 NewVer</td>
-                <td style="width: 160px;">中央線など</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:blue;"><a>周辺地域113番</a></th>
-                <td style="width: 300px;">For Tomorrow</td>
-                <td style="width: 160px;">辰野</td>
-                <td style="width: 160px;"><span style="color: green;">使用中(辰野)</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:deepskyblue;"><a href="melody/shutoken/shutoken1/shutoken1.html" style="color: black;">首都圏1番</a></th>
-                <td style="width: 300px;">JRE-IKST-007</td>
-                <td style="width: 160px;">横浜</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a href="melody/shutoken/shutoken2/shutoken2.html" style="color: black;">首都圏2番</a></th>
-                <td style="width: 300px;">JRE-IKST-017</td>
-                <td style="width: 160px;">横浜</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orange;"><a href="melody/shutoken/shutoken3/shutoken3.html" style="color: black;">首都圏3番</a></th>
-                <td style="width: 300px;">JRE-IKST-021</td>
-                <td style="width: 160px;">横浜</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; background-color:mediumblue;"><a href="melody/shutoken/shutoken4/shutoken4.html" style="color: white;">首都圏4番</a></th>
-                <td style="width: 300px;">JRE-IKST-015</td>
-                <td style="width: 160px;">横浜</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:forestgreen;"><a>首都圏5番</a></th>
-                <td style="width: 300px;">JRE-IKST-006</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:firebrick;"><a>首都圏6番</a></th>
-                <td style="width: 300px;">JRE-IKST-009</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏7番</a></th>
-                <td style="width: 300px;">JRE-IKST-011</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏8番</a></th>
-                <td style="width: 300px;">JRE-IKST-016</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:blue;"><a>首都圏9番</a></th>
-                <td style="width: 300px;">JRE-IKST-012</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>首都圏10番</a></th>
-                <td style="width: 300px;">JRE-IKST-003</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellowgreen;"><a>首都圏11番</a></th>
-                <td style="width: 300px;">JRE-IKST-010</td>
-                <td style="width: 160px;">新宿</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orange;"><a>首都圏12番</a></th>
-                <td style="width: 300px;">JRE-IKST-013</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:mediumblue;"><a>首都圏13番</a></th>
-                <td style="width: 300px;">JRE-IKST-005</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:red;"><a>首都圏14番</a></th>
-                <td style="width: 300px;">JRE-IKST-004</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:red;"><a>首都圏15番</a></th>
-                <td style="width: 300px;">JRE-IKST-001</td>
-                <td style="width: 160px;">東京</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:mediumblue;"><a>首都圏16番</a></th>
-                <td style="width: 300px;">JRE-IKST-008</td>
-                <td style="width: 160px;">逗子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏17番</a></th>
-                <td style="width: 300px;">JRE-IKST-002</td>
-                <td style="width: 160px;">府中本町</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏18番</a></th>
-                <td style="width: 300px;">JRE-IKST-019</td>
-                <td style="width: 160px;">東所沢</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:firebrick;"><a>首都圏19番</a></th>
-                <td style="width: 300px;">JRE-IKST-018</td>
-                <td style="width: 160px;">池袋</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:forestgreen;"><a>首都圏20番</a></th>
-                <td style="width: 300px;">JRE-IKST-014</td>
-                <td style="width: 160px;">大宮</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:darkblue;"><a>首都圏21番</a></th>
-                <td style="width: 300px;">JRE-IKST-020</td>
-                <td style="width: 160px;">上野</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏22番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;">立川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏23番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;">立川</td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>首都圏24番</a></th>
-                <td style="width: 300px;">JRE-IKST-023</td>
-                <td style="width: 160px;">小淵沢</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:chartreuse;"><a>首都圏25番</a></th>
-                <td style="width: 300px;">JRE-IKST-026</td>
-                <td style="width: 160px;">信越本線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:darkturquoise;"><a>首都圏26番</a></th>
-                <td style="width: 300px;">JRE-IKST-025</td>
-                <td style="width: 160px;">上越線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:gold;"><a>首都圏27番</a></th>
-                <td style="width: 300px;">JRE-IKST-028</td>
-                <td style="width: 160px;">両毛線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:darkcyan;"><a>首都圏28番</a></th>
-                <td style="width: 300px;">JRE-IKST-038</td>
-                <td style="width: 160px;">吾妻線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: white; background-color:purple;"><a>首都圏29番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">宇都宮</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏30番</a></th>
-                <td style="width: 300px;">JRE-IKST-102</td>
-                <td style="width: 160px;">上越新幹線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏31番</a></th>
-                <td style="width: 300px;">JRE-IKST-105</td>
-                <td style="width: 160px;">北陸新幹線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:darkolivegreen;"><a>首都圏31番</a></th>
-                <td style="width: 300px;">JRE-IKST-031</td>
-                <td style="width: 160px;">水郡線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:brown;"><a>首都圏32番</a></th>
-                <td style="width: 300px;">JRE-IKST-027</td>
-                <td style="width: 160px;">外房線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:yellow;"><a>首都圏33番</a></th>
-                <td style="width: 300px;">JRE-IKST-039</td>
-                <td style="width: 160px;">銚子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:seagreen;"><a>首都圏35番</a></th>
-                <td style="width: 300px;">JRE-IKST-042</td>
-                <td style="width: 160px;">銚子</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:aqua;"><a>首都圏36番</a></th>
-                <td style="width: 300px;">JRE-IKST-022</td>
-                <td style="width: 160px;">浜野</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:saddlebrown;"><a>首都圏37番</a></th>
-                <td style="width: 300px;">JRE-IKST-047</td>
-                <td style="width: 160px;">鹿島線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:crimson;"><a>首都圏38番</a></th>
-                <td style="width: 300px;">JRE-IKST-044</td>
-                <td style="width: 160px;">東金線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:sienna;"><a>首都圏39番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">松本</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumpurple;"><a>首都圏40番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">松本</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:orangered;"><a>首都圏41番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">立川</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏42番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">大宮</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:cadetblue;"><a>首都圏43番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">相模線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumseagreen;"><a>東北101番</a></th>
-                <td style="width: 300px;">JRE-IKST-101</td>
-                <td style="width: 160px;">東北新幹線</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumorchid;"><a>東北102番</a></th>
-                <td style="width: 300px;">JRE-IKST-036</td>
-                <td style="width: 160px;">いわき</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:mediumorchid;"><a>東北104番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">盛岡</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:goldenrod;"><a>東北105番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">一ノ関</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:coral;"><a>東北106番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">青森</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:cornflowerblue;"><a>東北107番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">青森</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-            <tr>
-                <th style="width: 250px; color: black; background-color:dodgerblue;"><a>東北108番</a></th>
-                <td style="width: 300px;"></td>
-                <td style="width: 160px;">花巻</td>
-                <td style="width: 160px;"><span style="color: green;">使用中</span></td>
-            </tr>
-        </table>
+
+    <body>
+
+        <!-- 三本線ボタン -->
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="メニューを開く"
+            aria-controls="sideMenu"
+            aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- メニューの背景 -->
+        <div
+            class="menu-overlay"
+            id="menuOverlay"
+            aria-hidden="true"></div>
+
+        <!-- サイドメニュー -->
+        <nav
+            class="side-menu"
+            id="sideMenu"
+            aria-label="サイトメニュー"
+            aria-hidden="true"
+            inert>
+            <h2 class="side-menu-heading">サイトメニュー</h2>
+            <p class="side-menu-label">SITE NAVIGATION</p>
+
+            <ul class="side-menu-list">
+
+            <!-- 路線・駅紹介 -->
+             <li>
+                <a class="side-menu-link" href="https://miyachifumito.github.io/HanwaLine-Committee/">
+                    <span>トップページ</span>
+                </a>
+            </li>
+
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>路線・駅紹介</span>
+                </a>
+            </li>
+
+            <!-- 発車メロディ -->
+            <li>
+                <button
+                    class="submenu-toggle"
+                    id="melodyToggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="melodySubmenu"
+                >
+                    <span>発車メロディ</span>
+                    <span class="submenu-arrow" aria-hidden="true">▼</span>
+                </button>
+
+                <div class="submenu" id="melodySubmenu">
+                    <div class="submenu-inner">
+
+                        <a
+                            class="submenu-link"
+                            href="melody.html"
+                        >
+                            発車メロディ実録・一覧
+                        </a>
+
+                        <a
+                            class="submenu-link"
+                            href="melody.html#history"
+                        >
+                            変更歴
+                        </a>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- 補助放送について -->
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>補助放送について</span>
+                </a>
+            </li>
+
+            <!-- リンク集 -->
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>リンク集</span>
+                </a>
+            </li>
+
+        </ul>
+        </nav>
+
+        <!-- ヘッダー -->
+        <header class="site-header">
+            <div class="header-inner">
+
+                <span class="site-label">OFFICIAL WEBSITE</span>
+
+                <h1 class="site-title">
+                    阪和線委員会公式<br>
+                    ～<span>発車メロディ</span>～
+                </h1>
+
+                <p class="site-subtitle">
+                    発車メロディの一覧・実録・変更情報
+                </p>
+
+            </div>
+        </header>
+
+        <main>
+
+            <!-- ページタイトル -->
+            <section>
+                <div class="heading-line"></div>
+
+                <h2 class="section-heading">
+                    発車メロディ一覧・実録
+                </h2>
+
+                <p class="section-description">
+                    JR東日本管内の発車メロディ情報を管理番号別に掲載しています。
+                </p>
+            </section>
+
+            <!-- 説明 -->
+            <section class="intro-card">
+                <p>
+                    管理番号をクリックすることでページに飛べます<br>
+                    基本JR東日本管内でのみの反映を載せているのでその他路線（しなの鉄道線）などは載せておりません。
+                </p>
+            </section>
+
+            <!-- 発車メロディ一覧表 -->
+            <section class="table-card">
+                <div class="table-scroll">
+
+                    <table class="melody-table">
+
+                        <thead>
+                            <tr>
+                                <th>管理番号</th>
+                                <th>曲名</th>
+                                <th>初回使用駅</th>
+                                <th style="width: 200px;">最終使用駅</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: darkblue;">
+                                    <a
+                                        href="melody/shuhen1/shuhen1.html"
+                                        style="color: white;">周辺地域1番</a>
+                                </th>
+                                <td style="width: 300px;">清流</td>
+                                <td style="width: 160px;">北千住</td>
+                                <td style="width: 160px;">勝浦</td>
+                            </tr>
+
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: deepskyblue;">
+                                    <a
+                                        href="melody/shuhen2/shuhen2.html"
+                                        style="color: black;">周辺地域2番</a>
+                                </th>
+                                <td style="width: 300px;">雲を友として</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;">安房鴨川</td>
+                            </tr>
+
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: blue;">
+                                    <a
+                                        href="melody/shuhen3/shuhen3.html"
+                                        style="color: white;">周辺地域3番</a>
+                                </th>
+                                <td style="width: 300px;">春</td>
+                                <td style="width: 160px;">(中央本線？)</td>
+                                <td style="width: 160px;">
+                                    <span style="color: green;">使用中</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: orangered;"><a
+                                        href="melody/shuhen4/shuhen4.html"
+                                        style="color: black;">周辺地域4番</a></th>
+                                <td style="width: 300px;">せせらぎ</td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: orange;"><a
+                                        href="melody/higashinihon5/higashinihon5.html"
+                                        style="color: black;">東日本地域5番</a></th>
+                                <td style="width: 300px;">Cielo Estrellado</td>
+                                <td style="width: 160px;">（東海道線？）</td>
+                                <td style="width: 160px;">大船</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: white;"><a
+                                        href="melody/higashinihon6/higashinihon6.html"
+                                        style="color: black;">東日本地域6番</a></th>
+                                <td style="width: 300px;">Gota del Vient</td>
+                                <td style="width: 160px;">（？）</td>
+                                <td style="width: 160px;">大船</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: mediumseagreen;"><a>東日本地域7番</a></th>
+                                <td style="width: 300px;">Water Crown</td>
+                                <td style="width: 160px;">（くりこま高原？）</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>東日本地域8番</a></th>
+                                <td style="width: 300px;">Verde Rayo</td>
+                                <td style="width: 160px;">（拝島？）</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(山形)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域9番</a></th>
+                                <td style="width: 300px;">高原</td>
+                                <td style="width: 160px;">（？）</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域10番</a></th>
+                                <td style="width: 300px;">草原</td>
+                                <td style="width: 160px;">（代々木？）</td>
+                                <td style="width: 160px;">大原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域11番</a></th>
+                                <td style="width: 300px;">四季～愛しき子供達へ</td>
+                                <td style="width: 160px;">（武蔵小金井？）</td>
+                                <td style="width: 160px;">茂原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域12番</a></th>
+                                <td style="width: 300px;">こころ</td>
+                                <td style="width: 160px;">（？）</td>
+                                <td style="width: 160px;">茂原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: gray;"><a>近郊地域13番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">川越線</td>
+                                <td style="width: 160px;">西川越</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: gray;"><a>近郊地域14番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">川越線</td>
+                                <td style="width: 160px;">西川越</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域15番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">（？）</td>
+                                <td style="width: 160px;">甲府</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域16番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">（？）</td>
+                                <td style="width: 160px;">甲府</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域17番</a></th>
+                                <td style="width: 300px;">クラルテ</td>
+                                <td style="width: 160px;">（稲毛？）</td>
+                                <td style="width: 160px;">安中榛名</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域18番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">（津田沼？）</td>
+                                <td style="width: 160px;">拝島</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域19番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">武蔵中原</td>
+                                <td style="width: 160px;">南武線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: darkcyan;"><a>近郊地域20番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">相模線</td>
+                                <td style="width: 160px;">相模線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域21番</a></th>
+                                <td style="width: 300px;">JR-SH5-1</td>
+                                <td style="width: 160px;">（武蔵新城？）</td>
+                                <td style="width: 160px;">佐原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域22番</a></th>
+                                <td style="width: 300px;">JR-SH5-3</td>
+                                <td style="width: 160px;">吹上</td>
+                                <td style="width: 160px;">勝浦</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域23番</a></th>
+                                <td style="width: 300px;">JR-SH2-1</td>
+                                <td style="width: 160px;">（南武線？）</td>
+                                <td style="width: 160px;">佐原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: orangered;"><a
+                                        href="melody/kinko24/kinko24.html"
+                                        style="color: black;">近郊地域24番</a></th>
+                                <td style="width: 300px;">JR-SH2-3</td>
+                                <td style="width: 160px;">八王子</td>
+                                <td style="width: 160px;">片倉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color: orangered;"><a
+                                        href="melody/kinko25/kinko25.html"
+                                        style="color: black;">近郊地域25番</a></th>
+                                <td style="width: 300px;">JR-SH1-1</td>
+                                <td style="width: 160px;">（八王子？）</td>
+                                <td style="width: 160px;">松本</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域26番</a></th>
+                                <td style="width: 300px;">JR-SH1-3</td>
+                                <td style="width: 160px;">辻堂</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(軽井沢)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域27番</a></th>
+                                <td style="width: 300px;">JR-SH8-1</td>
+                                <td style="width: 160px;">桶川</td>
+                                <td style="width: 160px;">桶川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellowgreen;"><a>近郊地域28番</a></th>
+                                <td style="width: 300px;">JR-SH8-3</td>
+                                <td style="width: 160px;">八王子</td>
+                                <td style="width: 160px;">勝浦</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域29番</a></th>
+                                <td style="width: 300px;">JR-SH3-1</td>
+                                <td style="width: 160px;">北本</td>
+                                <td style="width: 160px;">北本</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域30番</a></th>
+                                <td style="width: 300px;">JR-SH3-3</td>
+                                <td style="width: 160px;">中央線</td>
+                                <td style="width: 160px;">佐原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域31番</a></th>
+                                <td style="width: 300px;">JR-SH9-1</td>
+                                <td style="width: 160px;"><span
+                                        style="color: red;">採用なし</span></td>
+                                <td style="width: 160px;"></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域32番</a></th>
+                                <td style="width: 300px;">JR-SH9-3</td>
+                                <td style="width: 160px;">御茶ノ水</td>
+                                <td style="width: 160px;">御茶ノ水</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域33番</a></th>
+                                <td style="width: 300px;">JR-SH4-1</td>
+                                <td style="width: 160px;">（宮原？）</td>
+                                <td style="width: 160px;">沼田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域34番</a></th>
+                                <td style="width: 300px;">JR-SH4-3</td>
+                                <td style="width: 160px;"><span
+                                        style="color: red;">採用なし</span></td>
+                                <td style="width: 160px;"></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: gray;"><a>近郊地域35番</a></th>
+                                <td style="width: 300px;">JR-SH7-1</td>
+                                <td style="width: 160px;">八王子</td>
+                                <td style="width: 160px;">本庄</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: white;"><a>近郊地域36番</a></th>
+                                <td style="width: 300px;">JR-SH7-3</td>
+                                <td style="width: 160px;"><span
+                                        style="color: red;">採用なし</span></td>
+                                <td style="width: 160px;"></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: gray;"><a>近郊地域37番</a></th>
+                                <td style="width: 300px;">JR-SH6-1</td>
+                                <td style="width: 160px;">八王子</td>
+                                <td style="width: 160px;">茅ヶ崎</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域38番</a></th>
+                                <td style="width: 300px;">JR-SH6-3</td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;">大原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域39番</a></th>
+                                <td style="width: 300px;">ホリデイ</td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;">中央線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域40番</a></th>
+                                <td style="width: 300px;">春待ち風</td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;">相原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域41番</a></th>
+                                <td style="width: 300px;">秋桜</td>
+                                <td style="width: 160px;">戸塚</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域42番</a></th>
+                                <td style="width: 300px;">あざみ野</td>
+                                <td style="width: 160px;">尾久</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(尾久)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域43番</a></th>
+                                <td style="width: 300px;">線路の彼方</td>
+                                <td style="width: 160px;">尾久</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域44番</a></th>
+                                <td style="width: 300px;">古いオルゴール</td>
+                                <td style="width: 160px;">代々木</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域45番</a></th>
+                                <td style="width: 300px;">光と風と</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域46番</a></th>
+                                <td style="width: 300px;">くるみあそび</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;">小金井</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域47番</a></th>
+                                <td style="width: 300px;">twilight</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: darkblue;"><a>近郊地域48番</a></th>
+                                <td style="width: 300px;">花と空</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(我孫子)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: darkblue;"><a>近郊地域49番</a></th>
+                                <td style="width: 300px;">sunrise</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(常磐線)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域50番</a></th>
+                                <td style="width: 300px;">cappuccino</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(我孫子)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域51番</a></th>
+                                <td style="width: 300px;">メロディー</td>
+                                <td style="width: 160px;">武蔵野線</td>
+                                <td style="width: 160px;">東大宮</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域52番</a></th>
+                                <td style="width: 300px;">スプリングボックス</td>
+                                <td style="width: 160px;">武蔵野線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域53番</a></th>
+                                <td style="width: 300px;">シンコペーション</td>
+                                <td style="width: 160px;">東大宮</td>
+                                <td style="width: 160px;">東大宮</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域54番</a></th>
+                                <td style="width: 300px;">朝の静けさ</td>
+                                <td style="width: 160px;">さいたま新都心</td>
+                                <td style="width: 160px;">青梅線・五日市線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域55番</a></th>
+                                <td style="width: 300px;">美しき丘</td>
+                                <td style="width: 160px;">さいたま新都心</td>
+                                <td style="width: 160px;">袖ヶ浦</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域56番</a></th>
+                                <td style="width: 300px;">mellow time</td>
+                                <td style="width: 160px;">岡本</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域57番</a></th>
+                                <td style="width: 300px;">sunny islands</td>
+                                <td style="width: 160px;">氏家</td>
+                                <td style="width: 160px;">市川大野など</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域58番</a></th>
+                                <td style="width: 300px;">dance on</td>
+                                <td style="width: 160px;">宝積寺</td>
+                                <td style="width: 160px;">日進</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域59番</a></th>
+                                <td style="width: 300px;">ベルの響き</td>
+                                <td style="width: 160px;">岡部</td>
+                                <td style="width: 160px;">外房線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域60番</a></th>
+                                <td style="width: 300px;">雪解け間近</td>
+                                <td style="width: 160px;">八街</td>
+                                <td style="width: 160px;">佐原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellowgreen;"><a>近郊地域61番</a></th>
+                                <td style="width: 300px;">花のほころび</td>
+                                <td style="width: 160px;">渋谷</td>
+                                <td style="width: 160px;">立川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域62番</a></th>
+                                <td style="width: 300px;">輝く街並み</td>
+                                <td style="width: 160px;">梁川</td>
+                                <td style="width: 160px;">梁川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: gray;"><a>近郊地域63番</a></th>
+                                <td style="width: 300px;">夏が来れば</td>
+                                <td style="width: 160px;">武蔵高萩</td>
+                                <td style="width: 160px;">武蔵高萩</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: forestgreen;"><a>近郊地域64番</a></th>
+                                <td style="width: 300px;">コーラルリーフ</td>
+                                <td style="width: 160px;">武蔵浦和</td>
+                                <td style="width: 160px;">銚子</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域65番</a></th>
+                                <td style="width: 300px;">星空の下</td>
+                                <td style="width: 160px;">府中本町</td>
+                                <td style="width: 160px;">新前橋</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: brown;"><a>近郊地域66番</a></th>
+                                <td style="width: 300px;">南風の行方</td>
+                                <td style="width: 160px;">誉田</td>
+                                <td style="width: 160px;">上総一ノ宮</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域67番</a></th>
+                                <td style="width: 300px;">春一番</td>
+                                <td style="width: 160px;">東松戸</td>
+                                <td style="width: 160px;">東松戸</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域68番</a></th>
+                                <td style="width: 300px;">公園の楓</td>
+                                <td style="width: 160px;">千葉みなと</td>
+                                <td style="width: 160px;">京葉線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域69番</a></th>
+                                <td style="width: 300px;">公園通り</td>
+                                <td style="width: 160px;">千葉みなと</td>
+                                <td style="width: 160px;">千葉みなと</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域70番</a></th>
+                                <td style="width: 300px;">九月の風</td>
+                                <td style="width: 160px;">千葉みなと</td>
+                                <td style="width: 160px;">千葉みなと</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域71番</a></th>
+                                <td style="width: 300px;">ドリームタイム</td>
+                                <td style="width: 160px;">稲毛海岸</td>
+                                <td style="width: 160px;">稲毛海岸</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域72番</a></th>
+                                <td style="width: 300px;">緑の車窓</td>
+                                <td style="width: 160px;">検見川浜</td>
+                                <td style="width: 160px;">検見川浜</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: red;"><a>近郊地域73番</a></th>
+                                <td style="width: 300px;">海辺の散歩</td>
+                                <td style="width: 160px;">南船橋</td>
+                                <td style="width: 160px;">佐野</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域74番</a></th>
+                                <td style="width: 300px;">蝶々のように</td>
+                                <td style="width: 160px;">佐倉</td>
+                                <td style="width: 160px;">佐倉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域75番</a></th>
+                                <td style="width: 300px;">summer night</td>
+                                <td style="width: 160px;">佐倉</td>
+                                <td style="width: 160px;">佐倉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域76番</a></th>
+                                <td style="width: 300px;">ムーンストーン</td>
+                                <td style="width: 160px;">佐倉</td>
+                                <td style="width: 160px;">佐倉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域77番</a></th>
+                                <td style="width: 300px;">シーウインド</td>
+                                <td style="width: 160px;">佐倉</td>
+                                <td style="width: 160px;">佐倉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: darkturquoise;"><a>近郊地域78番</a></th>
+                                <td style="width: 300px;">ジュピターB</td>
+                                <td style="width: 160px;">井野</td>
+                                <td style="width: 160px;">上越線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域79番</a></th>
+                                <td style="width: 300px;">空へ</td>
+                                <td style="width: 160px;">竜王</td>
+                                <td style="width: 160px;">竜王</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域80番</a></th>
+                                <td style="width: 300px;">柔らかな草原</td>
+                                <td style="width: 160px;">竜王</td>
+                                <td style="width: 160px;">竜王</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>近郊地域81番</a></th>
+                                <td style="width: 300px;">ドリーム・パーク</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;">東京</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域82番</a></th>
+                                <td style="width: 300px;">春だより</td>
+                                <td style="width: 160px;">両国</td>
+                                <td style="width: 160px;">両国</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域83番</a></th>
+                                <td style="width: 300px;">夢のワルツ</td>
+                                <td style="width: 160px;">両国</td>
+                                <td style="width: 160px;">両国</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域84番</a></th>
+                                <td style="width: 300px;">森の妖精</td>
+                                <td style="width: 160px;">市川</td>
+                                <td style="width: 160px;">市川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: yellow;"><a>近郊地域85番</a></th>
+                                <td style="width: 300px;">朝つゆ</td>
+                                <td style="width: 160px;">市川</td>
+                                <td style="width: 160px;">市川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域86番</a></th>
+                                <td style="width: 300px;">楽々鉄道旅行</td>
+                                <td style="width: 160px;">市川</td>
+                                <td style="width: 160px;">青梅</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orangered;"><a>近郊地域87番</a></th>
+                                <td style="width: 300px;">旅の予感</td>
+                                <td style="width: 160px;">青梅線</td>
+                                <td style="width: 160px;">青梅線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域88番</a></th>
+                                <td style="width: 300px;">キッズステーション</td>
+                                <td style="width: 160px;">巌根</td>
+                                <td style="width: 160px;">羽沢横浜国大</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: brown;"><a>近郊地域89番</a></th>
+                                <td style="width: 300px;">朝の教会</td>
+                                <td style="width: 160px;">安房鴨川</td>
+                                <td style="width: 160px;">安房鴨川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: brown;"><a>近郊地域90番</a></th>
+                                <td style="width: 300px;">幸せチャイム</td>
+                                <td style="width: 160px;">安房鴨川</td>
+                                <td style="width: 160px;">安房鴨川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域91番</a></th>
+                                <td style="width: 300px;">通称(思い出の街)</td>
+                                <td style="width: 160px;">成田</td>
+                                <td style="width: 160px;">成田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域92番</a></th>
+                                <td style="width: 300px;">窓の花飾り</td>
+                                <td style="width: 160px;">成田</td>
+                                <td style="width: 160px;">成田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域93番</a></th>
+                                <td style="width: 300px;">スイートコール</td>
+                                <td style="width: 160px;">成田</td>
+                                <td style="width: 160px;">成田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域94番</a></th>
+                                <td style="width: 300px;">フラワーショップ</td>
+                                <td style="width: 160px;">成田</td>
+                                <td style="width: 160px;">青梅</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域95番</a></th>
+                                <td style="width: 300px;">旅立ちB</td>
+                                <td style="width: 160px;">成田</td>
+                                <td style="width: 160px;">成田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域96番</a></th>
+                                <td style="width: 300px;">田園浪漫</td>
+                                <td style="width: 160px;">竜王</td>
+                                <td style="width: 160px;">竜王</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: blue;"><a>近郊地域97番</a></th>
+                                <td style="width: 300px;">高原のつぶやき</td>
+                                <td style="width: 160px;">竜王</td>
+                                <td style="width: 160px;">竜王</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>近郊地域98番</a></th>
+                                <td style="width: 300px;">希望の朝</td>
+                                <td style="width: 160px;">成田空港</td>
+                                <td style="width: 160px;">成田空港</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color: mediumblue;"><a>近郊地域99番</a></th>
+                                <td style="width: 300px;">淡い恋心</td>
+                                <td style="width: 160px;">武蔵小杉</td>
+                                <td style="width: 160px;">武蔵小杉</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:blue;"><a>近郊地域100番</a></th>
+                                <td style="width: 300px;">青空と線路</td>
+                                <td style="width: 160px;">甲府</td>
+                                <td style="width: 160px;">甲府</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:gold;"><a>近郊地域101番</a></th>
+                                <td style="width: 300px;">ジュピターG</td>
+                                <td style="width: 160px;">伊勢崎</td>
+                                <td style="width: 160px;">伊勢崎</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:gold;"><a>近郊地域102番</a></th>
+                                <td style="width: 300px;">通勤ステップ</td>
+                                <td style="width: 160px;">伊勢崎</td>
+                                <td style="width: 160px;">伊勢崎</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>近郊地域103番</a></th>
+                                <td style="width: 300px;">ハッピーガール</td>
+                                <td style="width: 160px;">幕張</td>
+                                <td style="width: 160px;">幕張</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>近郊地域104番</a></th>
+                                <td style="width: 300px;">朝のドヴィッシー</td>
+                                <td style="width: 160px;">幕張</td>
+                                <td style="width: 160px;">幕張</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>近郊地域105番</a></th>
+                                <td style="width: 300px;">ジュピターE</td>
+                                <td style="width: 160px;">幕張</td>
+                                <td style="width: 160px;">幕張</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>近郊地域106番</a></th>
+                                <td style="width: 300px;">幸福の銀レール</td>
+                                <td style="width: 160px;">幕張</td>
+                                <td style="width: 160px;">幕張</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>近郊地域107番</a></th>
+                                <td style="width: 300px;">パシフィック</td>
+                                <td style="width: 160px;">南流山</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(南流山)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orange;"><a>近郊地域108番</a></th>
+                                <td style="width: 300px;">ナイスガイ！</td>
+                                <td style="width: 160px;">品川</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(品川)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orange;"><a>近郊地域109番</a></th>
+                                <td style="width: 300px;">蝶</td>
+                                <td style="width: 160px;">品川</td>
+                                <td style="width: 160px;">品川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>近郊地域110番</a></th>
+                                <td style="width: 300px;">木もれ陽の散歩道</td>
+                                <td style="width: 160px;">東神奈川</td>
+                                <td style="width: 160px;">武蔵小金井</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域111番</a></th>
+                                <td style="width: 300px;">子</td>
+                                <td style="width: 160px;">取手</td>
+                                <td style="width: 160px;">取手</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:deepskyblue;"><a>近郊地域112番</a></th>
+                                <td style="width: 300px;">おはよう</td>
+                                <td style="width: 160px;">品川</td>
+                                <td style="width: 160px;">品川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>近郊地域113番</a></th>
+                                <td style="width: 300px;">トレイントレイン</td>
+                                <td style="width: 160px;">品川</td>
+                                <td style="width: 160px;">品川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域114番</a></th>
+                                <td style="width: 300px;">JR-SHR1-1</td>
+                                <td style="width: 160px;">東我孫子</td>
+                                <td style="width: 160px;">東我孫子</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域115番</a></th>
+                                <td style="width: 300px;">JR-SHR1-3</td>
+                                <td style="width: 160px;">安食</td>
+                                <td style="width: 160px;">安食</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域116番</a></th>
+                                <td style="width: 300px;">JR-SHR2-1</td>
+                                <td style="width: 160px;">小林</td>
+                                <td style="width: 160px;">小林</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域117番</a></th>
+                                <td style="width: 300px;">JR-SHR2-3</td>
+                                <td style="width: 160px;">東我孫子</td>
+                                <td style="width: 160px;">東我孫子</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域118番</a></th>
+                                <td style="width: 300px;">JR-SHR3-1</td>
+                                <td style="width: 160px;">木下</td>
+                                <td style="width: 160px;">木下</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域119番</a></th>
+                                <td style="width: 300px;">JR-SHR3-3</td>
+                                <td style="width: 160px;">湖北</td>
+                                <td style="width: 160px;">湖北</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:mediumblue;"><a>近郊地域120番</a></th>
+                                <td style="width: 300px;">JR-SHR4-1</td>
+                                <td style="width: 160px;">稲毛</td>
+                                <td style="width: 160px;">稲毛</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域121番</a></th>
+                                <td style="width: 300px;">JR-SHR4-3</td>
+                                <td style="width: 160px;">布佐</td>
+                                <td style="width: 160px;">布佐</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:brown;"><a>近郊地域122番</a></th>
+                                <td style="width: 300px;">JR-SHR5-1</td>
+                                <td style="width: 160px;">誉田</td>
+                                <td style="width: 160px;">誉田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域123番</a></th>
+                                <td style="width: 300px;">JR-SHR5-3</td>
+                                <td style="width: 160px;">木下</td>
+                                <td style="width: 160px;">木下</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域124番</a></th>
+                                <td style="width: 300px;">JR-SHR6-1</td>
+                                <td style="width: 160px;">新木</td>
+                                <td style="width: 160px;">新木</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域125番</a></th>
+                                <td style="width: 300px;">JR-SHR6-3</td>
+                                <td style="width: 160px;">小林</td>
+                                <td style="width: 160px;">小林</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域126番</a></th>
+                                <td style="width: 300px;">JR-SHR7-1</td>
+                                <td style="width: 160px;">湖北</td>
+                                <td style="width: 160px;">湖北</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:brown;"><a>近郊地域127番</a></th>
+                                <td style="width: 300px;">JR-SHR7-3</td>
+                                <td style="width: 160px;">誉田</td>
+                                <td style="width: 160px;">誉田</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域128番</a></th>
+                                <td style="width: 300px;">JR-SHR8-1</td>
+                                <td style="width: 160px;">布佐</td>
+                                <td style="width: 160px;">布佐</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:mediumblue;"><a>近郊地域129番</a></th>
+                                <td style="width: 300px;">JR-SHR8-3</td>
+                                <td style="width: 160px;">稲毛</td>
+                                <td style="width: 160px;">稲毛</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域130番</a></th>
+                                <td style="width: 300px;">JR-SHR9-1</td>
+                                <td style="width: 160px;">安食</td>
+                                <td style="width: 160px;">安食</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>近郊地域131番</a></th>
+                                <td style="width: 300px;">JR-SHR9-3</td>
+                                <td style="width: 160px;">新木</td>
+                                <td style="width: 160px;">新木</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:forestgreen;"><a>新宿102番</a></th>
+                                <td style="width: 300px;">farewell</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">五日市線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:forestgreen;"><a>新宿103番</a></th>
+                                <td style="width: 300px;">遠い青空</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">相原</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:forestgreen;"><a>新宿104番</a></th>
+                                <td style="width: 300px;">夏色の時間</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">新習志野</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: orange;"><a>新宿105番</a></th>
+                                <td style="width: 300px;">美しき丘</td>
+                                <td style="width: 160px;">さいたま新都心</td>
+                                <td style="width: 160px;">袖ヶ浦</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:firebrick;"><a>新宿106番</a></th>
+                                <td style="width: 300px;">see you again</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">東北新幹線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>新宿107番</a></th>
+                                <td style="width: 300px;">海岸通り</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">上総一ノ宮</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>新宿108番</a></th>
+                                <td style="width: 300px;">すすきの高原</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>新宿109番</a></th>
+                                <td style="width: 300px;">小川のせせらぎ</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>新宿110番</a></th>
+                                <td style="width: 300px;">木々の目覚め</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">拝島</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>新宿111番</a></th>
+                                <td style="width: 300px;">風と共に</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">東北新幹線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>新宿112番</a></th>
+                                <td style="width: 300px;">新たな季節</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">埼京線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color: seagreen;"><a>新宿113番</a></th>
+                                <td style="width: 300px;">twilight</td>
+                                <td style="width: 160px;">我孫子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(長野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>新宿114番</a></th>
+                                <td style="width: 300px;">airly</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;">外房線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域101番</a></th>
+                                <td style="width: 300px;">SF22-29</td>
+                                <td style="width: 160px;">金町</td>
+                                <td style="width: 160px;">常磐線</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域102番</a></th>
+                                <td style="width: 300px;">SF-2</td>
+                                <td style="width: 160px;">金町</td>
+                                <td style="width: 160px;">金町</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域103番</a></th>
+                                <td style="width: 300px;">遊園地のある駅</td>
+                                <td style="width: 160px;">大崎</td>
+                                <td style="width: 160px;">品川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域104番</a></th>
+                                <td style="width: 300px;">海の駅</td>
+                                <td style="width: 160px;">大崎</td>
+                                <td style="width: 160px;">大崎</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域105番</a></th>
+                                <td style="width: 300px;">教会の見える駅</td>
+                                <td style="width: 160px;">大崎</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>周辺地域106番</a></th>
+                                <td style="width: 300px;">SF10-38</td>
+                                <td style="width: 160px;">大崎</td>
+                                <td style="width: 160px;">大崎</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:deepskyblue;"><a>周辺地域107番</a></th>
+                                <td style="width: 300px;">チャイム</td>
+                                <td style="width: 160px;">品川</td>
+                                <td style="width: 160px;">品川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域108番</a></th>
+                                <td style="width: 300px;">SF10-31</td>
+                                <td style="width: 160px;">柏</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(辰野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:darkblue;"><a>周辺地域109番</a></th>
+                                <td style="width: 300px;">SF10-43</td>
+                                <td style="width: 160px;">柏</td>
+                                <td style="width: 160px;">柏</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:darkblue;"><a>周辺地域110番</a></th>
+                                <td style="width: 300px;">SF10-68</td>
+                                <td style="width: 160px;">松戸</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(品川)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>周辺地域111番</a></th>
+                                <td style="width: 300px;">SF22-14</td>
+                                <td style="width: 160px;">松戸</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(南流山)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>周辺地域112番</a></th>
+                                <td style="width: 300px;">春 NewVer</td>
+                                <td style="width: 160px;">中央線など</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:blue;"><a>周辺地域113番</a></th>
+                                <td style="width: 300px;">For Tomorrow</td>
+                                <td style="width: 160px;">辰野</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中(辰野)</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:deepskyblue;"><a
+                                        href="melody/shutoken/shutoken1/shutoken1.html"
+                                        style="color: black;">首都圏1番</a></th>
+                                <td style="width: 300px;">JRE-IKST-007</td>
+                                <td style="width: 160px;">横浜</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a
+                                        href="melody/shutoken/shutoken2/shutoken2.html"
+                                        style="color: black;">首都圏2番</a></th>
+                                <td style="width: 300px;">JRE-IKST-017</td>
+                                <td style="width: 160px;">横浜</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orange;"><a
+                                        href="melody/shutoken/shutoken3/shutoken3.html"
+                                        style="color: black;">首都圏3番</a></th>
+                                <td style="width: 300px;">JRE-IKST-021</td>
+                                <td style="width: 160px;">横浜</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; background-color:mediumblue;"><a
+                                        href="melody/shutoken/shutoken4/shutoken4.html"
+                                        style="color: white;">首都圏4番</a></th>
+                                <td style="width: 300px;">JRE-IKST-015</td>
+                                <td style="width: 160px;">横浜</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:forestgreen;"><a>首都圏5番</a></th>
+                                <td style="width: 300px;">JRE-IKST-006</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:firebrick;"><a>首都圏6番</a></th>
+                                <td style="width: 300px;">JRE-IKST-009</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏7番</a></th>
+                                <td style="width: 300px;">JRE-IKST-011</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏8番</a></th>
+                                <td style="width: 300px;">JRE-IKST-016</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:blue;"><a>首都圏9番</a></th>
+                                <td style="width: 300px;">JRE-IKST-012</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>首都圏10番</a></th>
+                                <td style="width: 300px;">JRE-IKST-003</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellowgreen;"><a>首都圏11番</a></th>
+                                <td style="width: 300px;">JRE-IKST-010</td>
+                                <td style="width: 160px;">新宿</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orange;"><a>首都圏12番</a></th>
+                                <td style="width: 300px;">JRE-IKST-013</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:mediumblue;"><a>首都圏13番</a></th>
+                                <td style="width: 300px;">JRE-IKST-005</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:red;"><a>首都圏14番</a></th>
+                                <td style="width: 300px;">JRE-IKST-004</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:red;"><a>首都圏15番</a></th>
+                                <td style="width: 300px;">JRE-IKST-001</td>
+                                <td style="width: 160px;">東京</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:mediumblue;"><a>首都圏16番</a></th>
+                                <td style="width: 300px;">JRE-IKST-008</td>
+                                <td style="width: 160px;">逗子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏17番</a></th>
+                                <td style="width: 300px;">JRE-IKST-002</td>
+                                <td style="width: 160px;">府中本町</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏18番</a></th>
+                                <td style="width: 300px;">JRE-IKST-019</td>
+                                <td style="width: 160px;">東所沢</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:firebrick;"><a>首都圏19番</a></th>
+                                <td style="width: 300px;">JRE-IKST-018</td>
+                                <td style="width: 160px;">池袋</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:forestgreen;"><a>首都圏20番</a></th>
+                                <td style="width: 300px;">JRE-IKST-014</td>
+                                <td style="width: 160px;">大宮</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:darkblue;"><a>首都圏21番</a></th>
+                                <td style="width: 300px;">JRE-IKST-020</td>
+                                <td style="width: 160px;">上野</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏22番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;">立川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏23番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;">立川</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>首都圏24番</a></th>
+                                <td style="width: 300px;">JRE-IKST-023</td>
+                                <td style="width: 160px;">小淵沢</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:chartreuse;"><a>首都圏25番</a></th>
+                                <td style="width: 300px;">JRE-IKST-026</td>
+                                <td style="width: 160px;">信越本線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:darkturquoise;"><a>首都圏26番</a></th>
+                                <td style="width: 300px;">JRE-IKST-025</td>
+                                <td style="width: 160px;">上越線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:gold;"><a>首都圏27番</a></th>
+                                <td style="width: 300px;">JRE-IKST-028</td>
+                                <td style="width: 160px;">両毛線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:darkcyan;"><a>首都圏28番</a></th>
+                                <td style="width: 300px;">JRE-IKST-038</td>
+                                <td style="width: 160px;">吾妻線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: white; background-color:purple;"><a>首都圏29番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">宇都宮</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏30番</a></th>
+                                <td style="width: 300px;">JRE-IKST-102</td>
+                                <td style="width: 160px;">上越新幹線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏31番</a></th>
+                                <td style="width: 300px;">JRE-IKST-105</td>
+                                <td style="width: 160px;">北陸新幹線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:darkolivegreen;"><a>首都圏31番</a></th>
+                                <td style="width: 300px;">JRE-IKST-031</td>
+                                <td style="width: 160px;">水郡線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:brown;"><a>首都圏32番</a></th>
+                                <td style="width: 300px;">JRE-IKST-027</td>
+                                <td style="width: 160px;">外房線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:yellow;"><a>首都圏33番</a></th>
+                                <td style="width: 300px;">JRE-IKST-039</td>
+                                <td style="width: 160px;">銚子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:seagreen;"><a>首都圏35番</a></th>
+                                <td style="width: 300px;">JRE-IKST-042</td>
+                                <td style="width: 160px;">銚子</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:aqua;"><a>首都圏36番</a></th>
+                                <td style="width: 300px;">JRE-IKST-022</td>
+                                <td style="width: 160px;">浜野</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:saddlebrown;"><a>首都圏37番</a></th>
+                                <td style="width: 300px;">JRE-IKST-047</td>
+                                <td style="width: 160px;">鹿島線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:crimson;"><a>首都圏38番</a></th>
+                                <td style="width: 300px;">JRE-IKST-044</td>
+                                <td style="width: 160px;">東金線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:sienna;"><a>首都圏39番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">松本</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumpurple;"><a>首都圏40番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">松本</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:orangered;"><a>首都圏41番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">立川</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumseagreen;"><a>首都圏42番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">大宮</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:cadetblue;"><a>首都圏43番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">相模線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumseagreen;"><a>東北101番</a></th>
+                                <td style="width: 300px;">JRE-IKST-101</td>
+                                <td style="width: 160px;">東北新幹線</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumorchid;"><a>東北102番</a></th>
+                                <td style="width: 300px;">JRE-IKST-036</td>
+                                <td style="width: 160px;">いわき</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:mediumorchid;"><a>東北104番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">盛岡</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:goldenrod;"><a>東北105番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">一ノ関</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:coral;"><a>東北106番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">青森</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:cornflowerblue;"><a>東北107番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">青森</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="width: 250px; color: black; background-color:dodgerblue;"><a>東北108番</a></th>
+                                <td style="width: 300px;"></td>
+                                <td style="width: 160px;">花巻</td>
+                                <td style="width: 160px;"><span
+                                        style="color: green;">使用中</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- フッター -->
+        <footer class="site-footer">
+            <p>阪和線委員会公式サイト</p>
+        </footer>
+
+        <script>
+        /* =========================
+           サイドメニュー
+        ========================= */
+
+        const menuToggle = document.getElementById("menuToggle");
+        const sideMenu = document.getElementById("sideMenu");
+        const menuOverlay = document.getElementById("menuOverlay");
+
+        const melodyToggle = document.getElementById("melodyToggle");
+        const melodySubmenu = document.getElementById("melodySubmenu");
+
+        function openMenu() {
+            sideMenu.classList.add("is-open");
+            menuOverlay.classList.add("is-visible");
+            document.body.classList.add("menu-open");
+
+            menuToggle.setAttribute("aria-expanded", "true");
+            menuToggle.setAttribute("aria-label", "メニューを閉じる");
+
+            sideMenu.setAttribute("aria-hidden", "false");
+            sideMenu.inert = false;
+        }
+
+        function closeMenu(returnFocus = true) {
+            sideMenu.classList.remove("is-open");
+            menuOverlay.classList.remove("is-visible");
+            document.body.classList.remove("menu-open");
+
+            menuToggle.setAttribute("aria-expanded", "false");
+            menuToggle.setAttribute("aria-label", "メニューを開く");
+
+            sideMenu.setAttribute("aria-hidden", "true");
+            sideMenu.inert = true;
+
+            if (returnFocus) {
+                menuToggle.focus();
+            }
+        }
+
+        menuToggle.addEventListener("click", () => {
+            const isOpen =
+                menuToggle.getAttribute("aria-expanded") === "true";
+
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        menuOverlay.addEventListener("click", () => {
+            closeMenu();
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (
+                event.key === "Escape" &&
+                menuToggle.getAttribute("aria-expanded") === "true"
+            ) {
+                closeMenu();
+            }
+        });
+
+        sideMenu.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                closeMenu(false);
+            });
+        });
+
+        /* =========================
+           発車メロディの開閉
+        ========================= */
+
+        melodyToggle.addEventListener("click", () => {
+            const isExpanded =
+                melodyToggle.getAttribute("aria-expanded") === "true";
+
+            melodyToggle.setAttribute(
+                "aria-expanded",
+                String(!isExpanded)
+            );
+
+            melodySubmenu.classList.toggle(
+                "is-expanded",
+                !isExpanded
+            );
+        });
+    </script>
+
     </body>
 </html>

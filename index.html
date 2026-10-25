@@ -1,79 +1,1037 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="icon" href="icon.ico">
-        <title>阪和線委員会公式～JR東日本発車メロディ～</title>
-        <style>
-    body {
-        margin: 0;
-        font-family: sans-serif;
-        background: #f4f6f8;
-        color: #222;
-        line-height: 1.7;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-        color:black;
-        padding: 6px;
-        margin: 0 0 20px 0;
-        font-size: 1.6rem;
-        letter-spacing: 1px;
-    }
+    <link rel="icon" href="icon.ico">
 
-    p {
-        background: white;
-        display: inline-block;
-        padding: 20px 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        max-width: 800px;
-    }
+    <title>阪和線委員会公式～JR東日本発車メロディ～</title>
 
-    span {
-        font-weight: bold;
-    }
+    <style>
+        /* =========================
+           基本設定
+        ========================= */
 
-    footer {
-        margin-top: 40px;
-        padding: 15px;
-        font-size: 0.9rem;
-        color: #666;
-        border-top: 1px solid #ddd;
-        background: #fff;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    h1 span {
-        color: green;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-</style>
-    </head>
-    <body style="text-align: center;">
-        <h1>阪和線委員会公式～<span>JR東日本発車メロディ</span>～サイト</h1>
-        <p>
-            阪和線委員会公式サイトの一部である発車メロディのページへようこそ！<br>
-            ここではJR東日本で現在JRE-IKST化進んでいる発車メロディの実録などを載せていきます。
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 24px;
+        }
+
+        body {
+            margin: 0;
+            color: #263445;
+            background: #f3f6fa;
+            font-family:
+                "Yu Gothic",
+                "Hiragino Kaku Gothic ProN",
+                Meiryo,
+                sans-serif;
+            line-height: 1.8;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        /* =========================
+           ヘッダー
+        ========================= */
+
+        .site-header {
+            color: #fff;
+            background: linear-gradient(
+                135deg,
+                #10243e,
+                #183e63
+            );
+            border-bottom: 4px solid #b8c9da;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 34px 28px 30px;
+        }
+
+        .site-label {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            color: #e2ebf5;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+        }
+
+        .site-title {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 38px);
+            font-weight: 700;
+            line-height: 1.5;
+            letter-spacing: 0.03em;
+        }
+
+        .site-title span {
+            color: #b8d9f4;
+        }
+
+        .site-subtitle {
+            margin: 10px 0 0;
+            color: #d2dfec;
+            font-size: 15px;
+            letter-spacing: 0.1em;
+        }
+
+        /* =========================
+           左上のメニューボタン
+        ========================= */
+
+        .menu-toggle {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1100;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+
+            width: 48px;
+            height: 48px;
+            padding: 10px;
+
+            border: 1px solid #dce4ed;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 3px 12px rgba(16, 36, 62, 0.15);
+
+            cursor: pointer;
+            transition:
+                background 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background: #edf4fa;
+            box-shadow: 0 5px 16px rgba(16, 36, 62, 0.2);
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            border-radius: 3px;
+            background: #183e63;
+
+            transition:
+                transform 0.25s,
+                opacity 0.2s;
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle[aria-expanded="true"] span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* =========================
+           メニューの背景
+        ========================= */
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+
+            background: rgba(9, 24, 42, 0.48);
+
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition:
+                opacity 0.3s,
+                visibility 0.3s;
+        }
+
+        .menu-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* =========================
+           サイドメニュー
+        ========================= */
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+
+            width: min(320px, 85vw);
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+
+            padding: 84px 18px 28px;
+
+            background: #fff;
+            border-right: 1px solid #dce4ed;
+            box-shadow: 8px 0 28px rgba(16, 36, 62, 0.12);
+
+            transform: translateX(-105%);
+            visibility: hidden;
+
+            transition:
+                transform 0.3s ease,
+                visibility 0.3s;
+        }
+
+        .side-menu.is-open {
+            transform: translateX(0);
+            visibility: visible;
+        }
+
+        .side-menu-heading {
+            margin: 0 0 8px;
+            padding: 0 12px 14px;
+
+            border-bottom: 2px solid #183e63;
+
+            color: #183653;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .side-menu-label {
+            margin: 0 0 18px;
+            padding: 0 12px;
+
+            color: #8997a7;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+        }
+
+        .side-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .side-menu-link,
+        .submenu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+
+            width: 100%;
+            min-height: 48px;
+            padding: 12px;
+
+            border: 0;
+            border-radius: 7px;
+
+            color: #344c66;
+            background: transparent;
+
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+
+            cursor: pointer;
+            transition:
+                background 0.2s,
+                color 0.2s;
+        }
+
+        .side-menu-link:hover,
+        .submenu-toggle:hover {
+            color: #1674ad;
+            background: #edf4fa;
+        }
+
+        .side-menu-link:focus-visible,
+        .submenu-toggle:focus-visible,
+        .menu-toggle:focus-visible {
+            outline: 3px solid #6aa5d4;
+            outline-offset: 3px;
+        }
+
+        .side-menu-link::before,
+        .submenu-toggle::before {
+            content: "";
+            flex: 0 0 5px;
+
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+
+            background: #467fa8;
+        }
+
+        .side-menu-link > span,
+        .submenu-toggle > span:first-of-type {
+            flex: 1;
+        }
+
+        .submenu-arrow {
+            flex: 0 0 auto;
+
+            color: #6e8ca9;
+            font-size: 12px;
+
+            transition: transform 0.2s;
+        }
+
+        .submenu-toggle[aria-expanded="true"] .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* =========================
+           発車メロディのサブメニュー
+        ========================= */
+
+        .submenu {
+            display: grid;
+            grid-template-rows: 0fr;
+
+            margin: 0;
+            padding: 0;
+
+            visibility: hidden;
+
+            transition:
+                grid-template-rows 0.25s,
+                margin 0.25s,
+                padding 0.25s,
+                visibility 0.25s;
+        }
+
+        .submenu-inner {
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .submenu.is-expanded {
+            grid-template-rows: 1fr;
+            margin: 2px 0 8px;
+            padding: 0 0 0 18px;
+            visibility: visible;
+        }
+
+        .submenu-link {
+            display: block;
+
+            margin-top: 3px;
+            padding: 10px 12px 10px 16px;
+
+            border-left: 2px solid #c7d8e8;
+            border-radius: 0 6px 6px 0;
+
+            color: #526a83;
+            font-size: 13px;
+
+            transition:
+                color 0.2s,
+                background 0.2s,
+                border-color 0.2s;
+        }
+
+        .submenu-link:hover {
+            color: #1674ad;
+            background: #edf4fa;
+            border-left-color: #467fa8;
+        }
+
+        .submenu-link::before {
+            content: "›";
+            margin-right: 10px;
+            color: #6e8ca9;
+        }
+
+        /* =========================
+           ナビゲーション
+        ========================= */
+
+        .site-nav {
+            background: #fff;
+            border-bottom: 1px solid #dce4ed;
+        }
+
+        .nav-inner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 34px;
+
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 28px;
+        }
+
+        .nav-inner a {
+            color: #344c66;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-inner a:hover {
+            color: #1674ad;
+        }
+
+        /* =========================
+           メインコンテンツ
+        ========================= */
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 64px;
+        }
+
+        .section-heading {
+            margin: 0 0 8px;
+            color: #183653;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .heading-line {
+            width: 48px;
+            height: 4px;
+            margin-bottom: 14px;
+            border-radius: 2px;
+            background: #467fa8;
+        }
+
+        .section-description {
+            margin: 0 0 24px;
+            color: #738196;
+            font-size: 14px;
+        }
+
+        /* =========================
+           ウェルカムカード
+        ========================= */
+
+        .welcome-section {
+            margin-bottom: 44px;
+        }
+
+        .welcome-card {
+            padding: 30px;
+            border: 1px solid #e0e7ef;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 5px 20px rgba(30, 53, 76, 0.05);
+        }
+
+        .welcome-label {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            color: #315d80;
+            background: #eaf2f9;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .welcome-title {
+            margin: 0 0 14px;
+            color: #183653;
+            font-size: 22px;
+            line-height: 1.6;
+        }
+
+        .welcome-text {
+            margin: 0;
+            color: #586a7e;
+            font-size: 15px;
+            line-height: 2;
+        }
+
+        .welcome-text strong {
+            color: #244e73;
+        }
+
+        /* =========================
+           コンテンツ一覧
+        ========================= */
+
+        .content-section {
+            margin-top: 40px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .menu-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+
+            min-height: 130px;
+            padding: 22px;
+
+            border: 1px solid #e0e7ef;
+            border-radius: 12px;
+            background: #fff;
+
+            box-shadow: 0 3px 12px rgba(30, 53, 76, 0.04);
+
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s,
+                border-color 0.2s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
+            border-color: #b8ccdf;
+            box-shadow: 0 8px 22px rgba(30, 53, 76, 0.09);
+        }
+
+        .menu-number {
+            display: flex;
+            flex: 0 0 48px;
+            align-items: center;
+            justify-content: center;
+
+            width: 48px;
+            height: 48px;
+
+            border-radius: 10px;
+            color: #fff;
+            background: #183e63;
+
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .menu-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .menu-title {
+            display: block;
+            margin: 0;
+            color: #213b55;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .menu-description {
+            display: block;
+            margin-top: 6px;
+            color: #8491a1;
+            font-size: 13px;
+        }
+
+        .menu-arrow {
+            flex: 0 0 auto;
+            color: #6e8ca9;
+            font-size: 25px;
+        }
+
+        /* =========================
+           ご案内
+        ========================= */
+
+        .notice-box {
+            margin-top: 30px;
+            padding: 18px 22px;
+
+            border-left: 4px solid #467fa8;
+            border-radius: 0 8px 8px 0;
+
+            background: #eaf0f6;
+            color: #53677c;
+            font-size: 13px;
+        }
+
+        .notice-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #244663;
+        }
+
+        /* =========================
+           フッター
+        ========================= */
+
+        .site-footer {
+            padding: 24px 20px;
+            border-top: 1px solid #dce4ed;
+            color: #738196;
+            background: #fff;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .site-footer p {
+            margin: 0;
+        }
+
+        /* =========================
+           スマートフォン対応
+        ========================= */
+
+        @media (max-width: 700px) {
+            .header-inner {
+                padding: 84px 20px 26px;
+            }
+
+            .site-title {
+                font-size: 25px;
+            }
+
+            .site-subtitle {
+                font-size: 13px;
+            }
+
+            .nav-inner {
+                gap: 8px 22px;
+                padding: 12px 20px;
+            }
+
+            main {
+                padding: 28px 16px 44px;
+            }
+
+            .section-heading {
+                font-size: 22px;
+            }
+
+            .welcome-card {
+                padding: 22px 18px;
+            }
+
+            .welcome-title {
+                font-size: 19px;
+            }
+
+            .welcome-text {
+                font-size: 14px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .menu-card {
+                min-height: 108px;
+                padding: 18px;
+            }
+
+            .menu-title {
+                font-size: 16px;
+            }
+
+            .menu-description {
+                font-size: 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+    </style>
+</head>
+
+<body id="top">
+
+    <!-- 左上の三本線ボタン -->
+    <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="メニューを開く"
+        aria-controls="sideMenu"
+        aria-expanded="false"
+    >
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- メニューを開いたときの背景 -->
+    <div
+        class="menu-overlay"
+        id="menuOverlay"
+        aria-hidden="true"
+    ></div>
+
+    <!-- サイドメニュー -->
+    <nav
+        class="side-menu"
+        id="sideMenu"
+        aria-label="サイトメニュー"
+        aria-hidden="true"
+        inert
+    >
+        <h2 class="side-menu-heading">
+            サイトメニュー
+        </h2>
+
+        <p class="side-menu-label">
+            SITE NAVIGATION
         </p>
-        <table border="1" align="center">
-            <tr>
-                <th style="width: 30px;">1</th>
-                <td style="width: 200px;"><a href="melody.html">発車メロディ一覧・実録</a></td>
-                <td style="width: 500px;">このページにて発車メロディの一覧と音声を公開します。</td>
-            </tr>
-            <tr>
-                <th>2</th>
-                <td>変更歴</td>
-                <td>発車メロディの変更を反映します。</td>
-            </tr>
-            <tr>
-                <th>3</th>
-                <td>リンク集</td>
-                <td>その他サイトへのリンクを載せています。</td>
-            </tr>
-        </table>
-    </body>
-    <footer>
-        @Hanwa line committees
+
+        <ul class="side-menu-list">
+
+            <!-- 路線・駅紹介 -->
+             <li>
+                <a class="side-menu-link" href="https://miyachifumito.github.io/HanwaLine-Committee/">
+                    <span>トップページ</span>
+                </a>
+            </li>
+
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>路線・駅紹介</span>
+                </a>
+            </li>
+
+            <!-- 発車メロディ -->
+            <li>
+                <button
+                    class="submenu-toggle"
+                    id="melodyToggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="melodySubmenu"
+                >
+                    <span>発車メロディ</span>
+                    <span class="submenu-arrow" aria-hidden="true">▼</span>
+                </button>
+
+                <div class="submenu" id="melodySubmenu">
+                    <div class="submenu-inner">
+
+                        <a
+                            class="submenu-link"
+                            href="melody.html"
+                        >
+                            発車メロディ実録・一覧
+                        </a>
+
+                        <a
+                            class="submenu-link"
+                            href="melody.html#history"
+                        >
+                            変更歴
+                        </a>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- 補助放送について -->
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>補助放送について</span>
+                </a>
+            </li>
+
+            <!-- リンク集 -->
+            <li>
+                <a class="side-menu-link" href="">
+                    <span>リンク集</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+    <!-- ヘッダー -->
+    <header class="site-header">
+        <div class="header-inner">
+
+            <span class="site-label">
+                OFFICIAL WEBSITE
+            </span>
+
+            <h1 class="site-title">
+                阪和線委員会公式<br>
+                ～<span>発車メロディ</span>～
+            </h1>
+
+            <p class="site-subtitle">
+                発車メロディの一覧・実録・変更情報
+            </p>
+
+        </div>
+    </header>
+
+    <!-- ナビゲーション -->
+    <nav class="site-nav" aria-label="ページ内ナビゲーション">
+        <div class="nav-inner">
+            <a href="#top">ホーム</a>
+            <a href="#about">このページについて</a>
+            <a href="#contents">コンテンツ一覧</a>
+        </div>
+    </nav>
+
+    <main>
+
+        <!-- ページ紹介 -->
+        <section class="welcome-section" id="about">
+
+            <div class="heading-line"></div>
+
+            <h2 class="section-heading">
+                発車メロディのページへようこそ
+            </h2>
+
+            <p class="section-description">
+                JR東日本の発車メロディに関する情報をご紹介します。
+            </p>
+
+            <div class="welcome-card">
+
+                <span class="welcome-label">
+                    ABOUT THIS SITE
+                </span>
+
+                <h3 class="welcome-title">
+                    JR東日本の発車メロディを楽しもう
+                </h3>
+
+                <p class="welcome-text">
+                    阪和線委員会公式サイトの一部である、
+                    発車メロディのページへようこそ！<br>
+                    ここでは、JR東日本で進んでいる
+                    <strong>JRE-IKST化</strong>に関する情報や、
+                    発車メロディの実録などを掲載していきます。
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- コンテンツ一覧 -->
+        <section class="content-section" id="contents">
+
+            <div class="heading-line"></div>
+
+            <h2 class="section-heading">
+                コンテンツ一覧
+            </h2>
+
+            <p class="section-description">
+                ご覧になりたい項目を選択してください。
+            </p>
+
+            <div class="menu-grid">
+
+                <!-- 発車メロディ一覧・実録 -->
+                <a class="menu-card" href="melody.html">
+
+                    <span class="menu-number">01</span>
+
+                    <span class="menu-text">
+                        <span class="menu-title">
+                            発車メロディ一覧・実録
+                        </span>
+
+                        <span class="menu-description">
+                            発車メロディの一覧や実録音声を掲載します。
+                        </span>
+                    </span>
+
+                    <span class="menu-arrow" aria-hidden="true">›</span>
+
+                </a>
+
+                <!-- 変更歴 -->
+                <a class="menu-card" href="#history">
+
+                    <span class="menu-number">02</span>
+
+                    <span class="menu-text">
+                        <span class="menu-title">
+                            変更歴
+                        </span>
+
+                        <span class="menu-description">
+                            発車メロディの変更に関する情報を掲載します。
+                        </span>
+                    </span>
+
+                    <span class="menu-arrow" aria-hidden="true">›</span>
+
+                </a>
+
+            </div>
+
+            <!-- 変更歴 -->
+            <div class="notice-box" id="history">
+
+                <strong>変更歴について</strong>
+
+                発車メロディの変更情報は、確認できた内容をもとに
+                順次更新していく予定です。
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="site-footer">
+
+        <p>
+            阪和線委員会公式サイト
+        </p>
+
     </footer>
+
+    <script>
+        /* =========================
+           サイドメニューの開閉
+        ========================= */
+
+        const menuToggle = document.getElementById("menuToggle");
+        const sideMenu = document.getElementById("sideMenu");
+        const menuOverlay = document.getElementById("menuOverlay");
+
+        const melodyToggle = document.getElementById("melodyToggle");
+        const melodySubmenu = document.getElementById("melodySubmenu");
+
+        function openMenu() {
+            sideMenu.classList.add("is-open");
+            menuOverlay.classList.add("is-visible");
+            document.body.classList.add("menu-open");
+
+            menuToggle.setAttribute("aria-expanded", "true");
+            menuToggle.setAttribute("aria-label", "メニューを閉じる");
+
+            sideMenu.setAttribute("aria-hidden", "false");
+            sideMenu.inert = false;
+
+            const firstLink = sideMenu.querySelector("a, button");
+
+            if (firstLink) {
+                firstLink.focus();
+            }
+        }
+
+        function closeMenu(returnFocus = true) {
+            sideMenu.classList.remove("is-open");
+            menuOverlay.classList.remove("is-visible");
+            document.body.classList.remove("menu-open");
+
+            menuToggle.setAttribute("aria-expanded", "false");
+            menuToggle.setAttribute("aria-label", "メニューを開く");
+
+            sideMenu.setAttribute("aria-hidden", "true");
+            sideMenu.inert = true;
+
+            if (returnFocus) {
+                menuToggle.focus();
+            }
+        }
+
+        menuToggle.addEventListener("click", () => {
+            const isOpen =
+                menuToggle.getAttribute("aria-expanded") === "true";
+
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        // 背景をクリックしたら閉じる
+        menuOverlay.addEventListener("click", () => {
+            closeMenu();
+        });
+
+        // Escキーで閉じる
+        document.addEventListener("keydown", (event) => {
+            if (
+                event.key === "Escape" &&
+                menuToggle.getAttribute("aria-expanded") === "true"
+            ) {
+                closeMenu();
+            }
+        });
+
+        // メニュー内のページリンクを押したら閉じる
+        sideMenu.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                closeMenu(false);
+            });
+        });
+
+        /* =========================
+           発車メロディのサブメニュー
+        ========================= */
+
+        melodyToggle.addEventListener("click", () => {
+            const isExpanded =
+                melodyToggle.getAttribute("aria-expanded") === "true";
+
+            melodyToggle.setAttribute(
+                "aria-expanded",
+                String(!isExpanded)
+            );
+
+            melodySubmenu.classList.toggle(
+                "is-expanded",
+                !isExpanded
+            );
+        });
+    </script>
+
+</body>
 </html>
